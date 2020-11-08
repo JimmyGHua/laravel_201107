@@ -86,15 +86,32 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * Update the specified account with password .
+     * @param Request $req
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $req)
     {
-        //
+        try {
+            $checkReq = $req->validate([
+                'Account' => ['required'],
+                'Password' => ['required'],
+            ]);
+
+            if ($checkReq) {
+                $accountRes = User::where('Account', '=', $req['Account'])->firstOrFail();
+
+                $accountRes->update([
+                    'Password' => $req['Password'],
+                ]);
+                return response()->json($this->successMessage, 200);
+            } else {
+                return response()->json($this->invalidMessage, 400);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json($e, 400);
+        }
     }
 
     /**
@@ -112,17 +129,11 @@ class UserController extends Controller
             if ($checkReq) {
                 $accountRes = User::where('Account', '=', $req['Account'])->firstOrFail()->delete();
 
-                if ($accountRes) {
-                    return response()->json($this->successMessage, 200);
-                } else {
-                    return response()->json($this->errorMessage, 400);
-                }
-            }
-            else {
+                return response()->json($this->successMessage, 200);
+            } else {
                 return response()->json($this->invalidMessage, 400);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json($e, 400);
         }
     }
