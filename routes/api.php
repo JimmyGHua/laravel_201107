@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::prefix('v1/user')->group(function () {
+    // create user with unique account
+    Route::post('create','\App\Http\Controllers\api\UserController@store');
+//    Route::post('create', function () {
+//        return 'Hello,';
+//    });
+});
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
