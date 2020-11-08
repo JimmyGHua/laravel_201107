@@ -16,12 +16,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/user')->group(function () {
     // create user with password and unique account
-    Route::post('create','\App\Http\Controllers\api\UserController@store');
+    Route::post('create', '\App\Http\Controllers\api\UserController@store');
     // delete member with given account
-    Route::post('delete','\App\Http\Controllers\api\UserController@destroy');
+    Route::post('delete', '\App\Http\Controllers\api\UserController@destroy');
     // update password with given account
-    Route::post('pwd/change','\App\Http\Controllers\api\UserController@update');
-
+    Route::post('pwd/change', '\App\Http\Controllers\api\UserController@update');
+    // auth member with account and password
+    Route::get('login', '\App\Http\Controllers\api\UserController@auth');
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

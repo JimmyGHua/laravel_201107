@@ -44,13 +44,14 @@ class UserController extends Controller
     }
 
     /**
-     * Store a new created resource from req.
+     * Store a new member created from post req
      * @param Request $req
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $req)
     {
         try {
+            // unique account
             $checkReq = $req->validate([
                 'Account' => ['required', 'unique:user'],
                 'Password' => ['required'],
@@ -86,7 +87,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified account with password .
+     * Update the specified account's password from post req
      * @param Request $req
      * @return \Illuminate\Http\JsonResponse
      */
@@ -115,7 +116,7 @@ class UserController extends Controller
     }
 
     /**
-     * Delete a created resource from req Account.
+     * Delete a created member with Account from post req
      * @param Request $req
      * @return \Illuminate\Http\JsonResponse
      */
@@ -127,9 +128,53 @@ class UserController extends Controller
             ]);
 
             if ($checkReq) {
-                $accountRes = User::where('Account', '=', $req['Account'])->firstOrFail()->delete();
+                User::where('Account', '=', $req['Account'])->firstOrFail()->delete();
 
                 return response()->json($this->successMessage, 200);
+            } else {
+                return response()->json($this->invalidMessage, 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json($e, 400);
+        }
+    }
+
+    /**
+     * Auth member with account and password from get req
+     * @param Request $req
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function auth(Request $req)
+    {
+        $authSuccessMessage = [
+            "code" => 0,
+            "Message" => "",
+            "Result" => null,
+        ];
+
+        $authFailMessage = [
+            "code" => "2",
+            "Message" => "Login Failed",
+            "Result" => null,
+        ];
+
+        try {
+            $checkReq = $req->validate([
+                'Account' => ['required'],
+                'Password' => ['required'],
+            ]);
+
+            if ($checkReq) {
+                $memberExist = User::where([
+                    ['Account', '=', $req['Account']],
+                    ['Password', '=', $req['Password']],
+                ])->exists();
+
+                if ($memberExist) {
+                    return response()->json($authSuccessMessage, 200);
+                } else {
+                    return response()->json($authFailMessage, 400);
+                }
             } else {
                 return response()->json($this->invalidMessage, 400);
             }
